@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+supabase
+openai
+PyPDF2
+python-multipart
+python-dotenv
+pgvector
+asyncpg
