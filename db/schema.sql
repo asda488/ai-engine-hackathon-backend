@@ -73,5 +73,34 @@ CREATE TABLE passports (
     readiness_score INT NOT NULL,
     xp INT NOT NULL,
     status TEXT NOT NULL,
+    score INT DEFAULT 0,
+    breakdown JSONB DEFAULT '{}',
     issued_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_document_chunks_document_id ON document_chunks(document_id);
+CREATE INDEX IF NOT EXISTS idx_document_chunks_embedding ON document_chunks USING ivfflat (embedding vector_cosine_ops) WITH (lists = 100);
+CREATE INDEX IF NOT EXISTS idx_passports_volunteer_id ON passports(volunteer_id);
+CREATE INDEX IF NOT EXISTS idx_quiz_attempts_volunteer_id ON quiz_attempts(volunteer_id);
+
+-- Similarity search RPC for pgvector
+CREATE OR REPLACE FUNCTION similarity_search(
+    query_embedding vector(1536),
+    document_id UUID,
+    top_k INT DEFAULT 5
+)
+RETURNS TABLE(chunk_text TEXT, similarity FLOAT)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+    RETURN QUERY
+    SELECT
+        dc.chunk_text,
+        1 - (dc.embedding <=> query_embedding) AS similarity
+    FROM document_chunks dc
+    WHERE dc.document_id = similarity_search.document_id
+    ORDER BY dc.embedding <=> query_embedding
+    LIMIT top_k;
+END;
+$$;
