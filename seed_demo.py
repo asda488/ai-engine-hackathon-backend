@@ -1,4 +1,5 @@
 import os
+import uuid
 from supabase import create_client
 from dotenv import load_dotenv
 
@@ -9,7 +10,7 @@ supabase = create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_SERVICE_
 def seed_demo_data():
     # Create employer
     employer = supabase.table("employers").insert({
-        "user_id": "demo-employer",
+        "user_id": str(uuid.uuid4()),
         "company_name": "The Fringe Bar"
     }).execute()
 
@@ -62,9 +63,9 @@ def seed_demo_data():
 
     # Create volunteers
     volunteers = [
-        {"user_id": "volunteer-1", "name": "Alex Turner", "email": "alex@example.com"},
-        {"user_id": "volunteer-2", "name": "Jamie Chen", "email": "jamie@example.com"},
-        {"user_id": "volunteer-3", "name": "Sam Reid", "email": "sam@example.com"}
+        {"user_id": str(uuid.uuid4()), "name": "Alex Turner", "email": "alex@example.com"},
+        {"user_id": str(uuid.uuid4()), "name": "Jamie Chen", "email": "jamie@example.com"},
+        {"user_id": str(uuid.uuid4()), "name": "Sam Reid", "email": "sam@example.com"}
     ]
 
     volunteer_ids = []
@@ -88,7 +89,9 @@ def seed_demo_data():
             "status": "SHIFT READY" if attempt["passed"] else "TRAINING REQUIRED"
         }).execute()
 
-    print("Demo data seeded successfully!")
+    print(f"Demo data seeded successfully!")
+    print(f"Employer ID: {employer_id}")
+    print(f"Use this in frontend/app/employer/page.tsx as EMPLOYER_ID")
 
 if __name__ == "__main__":
     seed_demo_data()

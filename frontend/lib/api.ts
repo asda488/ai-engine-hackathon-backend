@@ -43,11 +43,23 @@ export const api = {
     return response.json();
   },
 
-  submitQuiz: async (volunteerId: string, quizId: string, answers: { question_id: number; selected_option: number }[]) => {
+  submitQuiz: async (
+    volunteerId: string,
+    volunteerName: string,
+    volunteerEmail: string,
+    quizId: string,
+    answers: { question_id: number; selected_option: number }[],
+  ) => {
     const response = await fetch(`${API_BASE_URL}/submit-quiz`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ volunteer_id: volunteerId, quiz_id: quizId, answers }),
+      body: JSON.stringify({
+        volunteer_id: volunteerId,
+        volunteer_name: volunteerName,
+        volunteer_email: volunteerEmail,
+        quiz_id: quizId,
+        answers,
+      }),
     });
     if (!response.ok) throw new Error(await response.text());
     return response.json();

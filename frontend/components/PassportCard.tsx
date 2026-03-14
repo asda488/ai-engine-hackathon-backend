@@ -53,68 +53,89 @@ export default function PassportCard({ passport, showShare = true }: PassportCar
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-      {/* Header band */}
-      <div className={`h-3 ${isReady ? 'bg-green-500' : 'bg-amber-400'}`} />
+    <div className="max-w-md mx-auto animate-bounce-in">
+      {/* Card */}
+      <div className={`relative rounded-3xl overflow-hidden shadow-2xl ${
+        isReady
+          ? 'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600'
+          : 'bg-gradient-to-br from-amber-500 via-orange-500 to-red-500'
+      }`}>
+        {/* Decorative circle */}
+        <div className="absolute -top-12 -right-12 w-48 h-48 rounded-full bg-white/10" />
+        <div className="absolute -bottom-8 -left-8 w-32 h-32 rounded-full bg-white/10" />
 
-      <div className="p-8">
-        {/* Avatar + name */}
-        <div className="text-center mb-6">
-          <div className="w-20 h-20 bg-blue-600 rounded-full mx-auto mb-3 flex items-center justify-center text-white text-2xl font-bold shadow">
-            {initials}
+        {/* Header */}
+        <div className="relative z-10 px-8 pt-8 pb-6 text-white text-center">
+          <div className="text-xs uppercase tracking-widest font-bold text-white/60 mb-4">ShiftPass · Digital Credential</div>
+
+          {/* Avatar */}
+          <div className="relative inline-block mb-4">
+            <div className="w-24 h-24 rounded-full bg-white/20 border-4 border-white/40 flex items-center justify-center text-3xl font-black text-white shadow-xl">
+              {initials}
+            </div>
+            <div className={`absolute -bottom-1 -right-1 w-8 h-8 rounded-full flex items-center justify-center text-sm shadow-lg border-2 border-white ${
+              isReady ? 'bg-emerald-400' : 'bg-amber-400'
+            }`}>
+              {isReady ? '✓' : '!'}
+            </div>
           </div>
-          <h1 className="text-2xl font-bold text-gray-900">{passport.volunteer_name}</h1>
-          <p className="text-gray-500">{passport.role}</p>
+
+          <h1 className="text-2xl font-black text-white">{passport.volunteer_name}</h1>
+          <p className="text-white/70 text-sm font-medium mt-1">{passport.role}</p>
         </div>
 
         {/* Status badge */}
-        <div className={`px-4 py-2 rounded-lg text-center font-semibold mb-6 ${
-          isReady ? 'bg-green-100 text-green-800' : 'bg-amber-100 text-amber-800'
-        }`}>
-          {isReady ? '✅' : '⚠️'} {passport.status}
+        <div className="relative z-10 mx-8 mb-6">
+          <div className="glass rounded-2xl px-4 py-3 text-center">
+            <span className="text-white font-bold text-sm tracking-wider">
+              {isReady ? '✅ SHIFT READY' : '⚠️ TRAINING REQUIRED'}
+            </span>
+          </div>
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="text-center bg-gray-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-blue-600">{passport.readiness_score}%</div>
-            <div className="text-xs text-gray-500 mt-1">Readiness</div>
-          </div>
-          <div className="text-center bg-gray-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-purple-600">{passport.xp}</div>
-            <div className="text-xs text-gray-500 mt-1">XP</div>
-          </div>
-          <div className="text-center bg-gray-50 rounded-lg p-3">
-            <div className="text-2xl font-bold text-green-600">{passport.score ?? passport.readiness_score}%</div>
-            <div className="text-xs text-gray-500 mt-1">Score</div>
-          </div>
+        {/* Stats */}
+        <div className="relative z-10 mx-8 mb-6 grid grid-cols-3 gap-3">
+          {[
+            { value: `${passport.readiness_score}%`, label: 'Readiness', icon: '🎯' },
+            { value: `${passport.xp}`, label: 'XP Earned', icon: '⚡' },
+            { value: `${passport.score ?? passport.readiness_score}%`, label: 'Score', icon: '🏆' },
+          ].map(({ value, label, icon }) => (
+            <div key={label} className="glass rounded-2xl p-3 text-center">
+              <div className="text-lg mb-0.5">{icon}</div>
+              <div className="text-white font-black text-lg leading-tight">{value}</div>
+              <div className="text-white/50 text-xs">{label}</div>
+            </div>
+          ))}
         </div>
 
         {/* Skills */}
-        <div className="mb-6">
-          <h3 className="text-sm font-semibold text-gray-700 mb-2 uppercase tracking-wide">Verified Skills</h3>
-          <div className="flex flex-wrap gap-2">
-            {passport.skills.map((skill, i) => (
-              <span key={i} className="bg-blue-50 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                {skillEmoji(skill)} {skill}
-              </span>
-            ))}
+        {passport.skills.length > 0 && (
+          <div className="relative z-10 mx-8 mb-6">
+            <p className="text-white/60 text-xs uppercase tracking-widest font-bold mb-3">Verified Skills</p>
+            <div className="flex flex-wrap gap-2">
+              {passport.skills.map((skill, i) => (
+                <span key={i} className="glass rounded-full px-3 py-1 text-white text-xs font-semibold">
+                  {skillEmoji(skill)} {skill}
+                </span>
+              ))}
+            </div>
           </div>
-        </div>
-
-        {/* Issued date */}
-        <p className="text-center text-xs text-gray-400 mb-4">
-          Issued {new Date(passport.issued_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-        </p>
-
-        {showShare && (
-          <button
-            onClick={handleShare}
-            className="w-full bg-blue-600 text-white px-4 py-2.5 rounded-lg hover:bg-blue-700 transition-colors font-medium"
-          >
-            Share Passport
-          </button>
         )}
+
+        {/* Footer */}
+        <div className="relative z-10 px-8 pb-8">
+          <p className="text-center text-white/40 text-xs mb-4">
+            Issued {new Date(passport.issued_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+          </p>
+          {showShare && (
+            <button
+              onClick={handleShare}
+              className="w-full bg-white/20 hover:bg-white/30 border border-white/30 text-white px-4 py-3 rounded-2xl font-bold text-sm transition-all hover:scale-105"
+            >
+              🔗 Share My ShiftPass
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

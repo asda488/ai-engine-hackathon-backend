@@ -1,16 +1,15 @@
-import openai
 import PyPDF2
 from supabase import create_client
 import os
 from typing import List
+from dotenv import load_dotenv
 
-# Initialize clients only if env vars are set
+load_dotenv()
+
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_SERVICE_KEY")
-openai_key = os.getenv("OPENAI_API_KEY")
 
 supabase = create_client(supabase_url, supabase_key) if supabase_url and supabase_key else None
-openai_client = openai.OpenAI(api_key=openai_key) if openai_key else None
 
 def extract_text_from_pdf(file_path: str) -> str:
     with open(file_path, "rb") as file:
@@ -40,20 +39,9 @@ def chunk_text(text: str, chunk_size: int = 500) -> List[str]:
 
     return chunks
 
-def generate_embeddings(chunks: List[str]) -> List[List[float]]:
-    embeddings = []
+def store_document_chunks(document_id: str, chunks: List[str]):
     for chunk in chunks:
-        response = openai_client.embeddings.create(
-            input=chunk,
-            model="text-embedding-3-small"
-        )
-        embeddings.append(response.data[0].embedding)
-    return embeddings
-
-def store_document_chunks(document_id: str, chunks: List[str], embeddings: List[List[float]]):
-    for chunk, embedding in zip(chunks, embeddings):
         supabase.table("document_chunks").insert({
             "document_id": document_id,
             "chunk_text": chunk,
-            "embedding": embedding
         }).execute()

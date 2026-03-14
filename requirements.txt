@@ -1,9 +1,10 @@
 fastapi
-uvicorn
+uvicorn[standard]
 supabase
-openai
+anthropic
 PyPDF2
 python-multipart
 python-dotenv
 pgvector
 asyncpg
+slowapi

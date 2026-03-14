@@ -22,10 +22,10 @@ export default function PassportPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900">
         <div className="text-center">
-          <div className="text-4xl mb-4 animate-pulse">🎫</div>
-          <p className="text-gray-600">Loading passport...</p>
+          <div className="text-5xl mb-4 animate-bounce">🎫</div>
+          <p className="text-white/60 font-medium">Loading passport...</p>
         </div>
       </div>
     );
@@ -33,15 +33,22 @@ export default function PassportPage() {
 
   if (error || !passport) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <p className="text-red-500">{error || 'Passport not found.'}</p>
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-violet-900 to-indigo-900">
+        <div className="glass rounded-3xl p-8 text-center">
+          <div className="text-4xl mb-3">🔍</div>
+          <p className="text-white/70">{error || 'Passport not found.'}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-8 flex items-center justify-center">
-      <PassportCard passport={{ ...passport, id: passportId }} showShare={true} />
+    <div className="min-h-screen bg-gradient-to-br from-violet-900 via-purple-900 to-indigo-900 p-6 flex items-center justify-center relative overflow-hidden">
+      <div className="absolute top-20 left-20 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-float" />
+      <div className="absolute bottom-20 right-20 w-72 h-72 bg-cyan-400 rounded-full mix-blend-multiply filter blur-3xl opacity-15 animate-float" style={{ animationDelay: '1s' }} />
+      <div className="relative z-10 w-full">
+        <PassportCard passport={{ ...passport, id: passportId }} showShare={true} />
+      </div>
     </div>
   );
 }

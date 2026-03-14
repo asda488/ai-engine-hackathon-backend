@@ -2,6 +2,15 @@ from fastapi import APIRouter, HTTPException
 from services.passport_service import get_passport, get_passport_by_id
 from supabase import create_client
 import os
+import uuid
+
+NAMESPACE = uuid.UUID("12345678-1234-5678-1234-567812345678")
+
+def resolve_employer_id(raw_id: str) -> str:
+    try:
+        return str(uuid.UUID(raw_id))
+    except (ValueError, AttributeError):
+        return str(uuid.uuid5(NAMESPACE, raw_id))
 
 router = APIRouter()
 
@@ -40,6 +49,7 @@ async def get_result(passport_id: str):
 @router.get("/employer/volunteers/{employer_id}")
 async def get_employer_volunteers(employer_id: str):
     try:
+        resolved_id = resolve_employer_id(employer_id)
         result = supabase.table("passports").select("""
             readiness_score, status, xp,
             volunteers(name, email),
@@ -53,7 +63,7 @@ async def get_employer_volunteers(employer_id: str):
             if not tm:
                 continue
             doc = tm.get('documents')
-            if not doc or doc.get('employer_id') != employer_id:
+            if not doc or doc.get('employer_id') != resolved_id:
                 continue
             v = passport.get('volunteers')
             volunteers.append({
